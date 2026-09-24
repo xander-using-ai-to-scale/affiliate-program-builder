@@ -1,0 +1,21 @@
+# Client work: configs with real ids, briefs, build records, flowcharts. Never committed.
+# (Not tied to the root on purpose: an old-style tools/ghl/clients/ folder is caught too.)
+clients/
+
+# The checker's list of forbidden strings, if someone keeps it next to the checker.
+tools/check-repo.forbidden.txt
+
+# templates/ holds data only: a render of the flowcharts template does not belong there.
+templates/*.html
+templates/*.pdf
+
+# Tools and OS junk
+node_modules/
+*.tmp
+.DS_Store
+Thumbs.db
+__pycache__/
+*.pyc
+
+# dist/*.zip stays tracked on purpose: it is the release for agents that cannot clone GitHub
+# (see dist/README.md).

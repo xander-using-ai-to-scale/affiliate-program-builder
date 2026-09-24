@@ -1,0 +1,442 @@
+{
+  "_about": [
+    "The standard structure of the GHL affiliate program: every custom field (name, type, options in order), tag, pipeline (stages in order), the Partner Intro Call calendar, and the names of the 8 workflows and 3 forms. Recovered from the first build (Sep 21-22 2026) over the API.",
+    "tools/ghl/build-structure.js, double-check.js and survey.js read this file. tools/ghl/structure.default.json is the fallback copy: tools/ghl/selftest.js fails when the two differ in any name, type, option, stage, calendar setting, workflow or form.",
+    "A client config (clients/<CLIENT_SLUG>/config.json) applies its changes on top, under \"structure\": the same name replaces an entry, a new name adds one, and \"remove\" drops names. See process/3-structure.md.",
+    "Always client-specific, set in the client config: the Partner Type options (the build refuses to run while they are empty), the segment/ tags, and the calendar slug and description. The first build also added one Lost Reason option (\"Already has an SEO partner\") through its config.",
+    "\"key\" on a field is the merge-field key GHL derives from the name (for example contact.referral_code, used as {{contact.referral_code}}). The scripts do not send it: GHL makes it. \"note\" is for people; the scripts ignore it.",
+    "dataType values are GHL API names: TEXT (single line), LARGE_TEXT (multi-line), NUMERICAL, MONETORY (GHL spelling), SINGLE_OPTIONS (dropdown), DATE.",
+    "The calendar hours (Mon and Tue 10:00-17:00, the account time zone), the owner (calendarOwnerUserId = <PLACEHOLDER_USER>) and the empty meeting link are placeholders until the client sets them in process/9-handover.md.",
+    "Workflows and forms are built in the GHL UI (spec/forms.md, spec/workflows/). Their names are listed here so double-check.js and survey.js --ids can find them."
+  ],
+  "fields": {
+    "contact": [
+      {
+        "name": "Instantly Campaign",
+        "key": "contact.instantly_campaign",
+        "dataType": "TEXT",
+        "note": "written by workflow 1 from the webhook campaign_name"
+      },
+      {
+        "name": "Partner Type",
+        "key": "contact.partner_type",
+        "dataType": "SINGLE_OPTIONS",
+        "options": [],
+        "note": "client-specific: set the options in the client config, Other last. The first build had 19 options (examples/example-seo-agency/config.json)"
+      },
+      {
+        "name": "Partner Tier",
+        "key": "contact.partner_tier",
+        "dataType": "SINGLE_OPTIONS",
+        "options": [
+          "Tier 1",
+          "Tier 2",
+          "Tier 3"
+        ],
+        "note": "built, not used by any workflow or form"
+      },
+      {
+        "name": "Partnership Type",
+        "key": "contact.partnership_type",
+        "dataType": "SINGLE_OPTIONS",
+        "options": [
+          "Referral",
+          "White Label"
+        ]
+      },
+      {
+        "name": "Next Action Date",
+        "key": "contact.next_action_date",
+        "dataType": "DATE",
+        "note": "workflow 1 sets it to the current date"
+      },
+      {
+        "name": "Lost Reason",
+        "key": "contact.lost_reason",
+        "dataType": "SINGLE_OPTIONS",
+        "options": [
+          "No fit",
+          "Not interested",
+          "No response",
+          "Bad timing",
+          "Do not contact"
+        ],
+        "note": "built, not used by any workflow. A client may add one industry-specific option through its config"
+      },
+      {
+        "name": "Affiliate Link",
+        "key": "contact.affiliate_link",
+        "dataType": "TEXT",
+        "note": "the partner's personal link: written by workflow 4, then overwritten by workflow 5 with GHL's link plus the Partner ID and name"
+      },
+      {
+        "name": "Agreement Signed Date",
+        "key": "contact.agreement_signed_date",
+        "dataType": "DATE",
+        "note": "filled by hand at onboarding (the onboarding task says so)"
+      },
+      {
+        "name": "Referrals Sent",
+        "key": "contact.referrals_sent",
+        "dataType": "NUMERICAL",
+        "note": "built, not used by any workflow"
+      },
+      {
+        "name": "Last Referral Date",
+        "key": "contact.last_referral_date",
+        "dataType": "DATE",
+        "note": "built, not used by any workflow"
+      },
+      {
+        "name": "Contact Role",
+        "key": "contact.contact_role",
+        "dataType": "SINGLE_OPTIONS",
+        "options": [
+          "Referral Partner",
+          "Referred Lead",
+          "Client Staff",
+          "Other"
+        ],
+        "note": "workflow 2/3 set Referred Lead, workflow 4 sets Referral Partner"
+      },
+      {
+        "name": "Partner ID",
+        "key": "contact.partner_id",
+        "dataType": "TEXT",
+        "note": "workflow 4 sets it to {{contact.id}}"
+      },
+      {
+        "name": "Referral Code",
+        "key": "contact.referral_code",
+        "dataType": "TEXT",
+        "note": "on a partner: their GHL Referral ID (am_id), written by workflow 5. On a lead: copied from Claimed Referral Code on a first claim; workflows 2/3 file the lead under the affiliate by it"
+      },
+      {
+        "name": "Reward Model",
+        "key": "contact.reward_model",
+        "dataType": "SINGLE_OPTIONS",
+        "options": [
+          "Per Lead",
+          "Per Show",
+          "Per Qualified Consult",
+          "Per Sale",
+          "Revenue Share",
+          "Custom / Non-Cash"
+        ],
+        "note": "workflow 4 sets it: Revenue Share for the monthly percentage variant (spec/variants.md)"
+      },
+      {
+        "name": "Revenue Share Percent",
+        "key": "contact.revenue_share_percent",
+        "dataType": "NUMERICAL",
+        "note": "workflow 4 sets it to the rate from the blueprint, a plain number (15 in the first build)"
+      },
+      {
+        "name": "Payment Preference",
+        "key": "contact.payment_preference",
+        "dataType": "SINGLE_OPTIONS",
+        "options": [
+          "ACH",
+          "Check",
+          "PayPal",
+          "Gift Card",
+          "Service Credit",
+          "Other"
+        ]
+      },
+      {
+        "name": "Referral Source Type",
+        "key": "contact.referral_source_type",
+        "dataType": "SINGLE_OPTIONS",
+        "options": [
+          "Partner",
+          "Friend / Family",
+          "Existing Client",
+          "Employee",
+          "Event",
+          "Other"
+        ]
+      },
+      {
+        "name": "Referring Partner Name",
+        "key": "contact.referring_partner_name",
+        "dataType": "TEXT"
+      },
+      {
+        "name": "Referring Partner ID",
+        "key": "contact.referring_partner_id",
+        "dataType": "TEXT"
+      },
+      {
+        "name": "Referral Attribution Method",
+        "key": "contact.referral_attribution_method",
+        "dataType": "SINGLE_OPTIONS",
+        "options": [
+          "Referral Link",
+          "QR Code",
+          "Partner Submission",
+          "Email Introduction",
+          "Dedicated Phone",
+          "Dedicated SMS",
+          "Booking Form",
+          "Intake Form",
+          "Self-Reported",
+          "Staff Entered",
+          "AI Suggested",
+          "Other"
+        ]
+      },
+      {
+        "name": "Attribution Confidence",
+        "key": "contact.attribution_confidence",
+        "dataType": "SINGLE_OPTIONS",
+        "options": [
+          "Verified",
+          "Claimed",
+          "Pending Verification",
+          "Conflicting",
+          "Rejected"
+        ]
+      },
+      {
+        "name": "Referral Date",
+        "key": "contact.referral_date",
+        "dataType": "DATE"
+      },
+      {
+        "name": "Referral Evidence",
+        "key": "contact.referral_evidence",
+        "dataType": "LARGE_TEXT",
+        "note": "copied from Claim Notes on a first claim"
+      },
+      {
+        "name": "Attribution Lock",
+        "key": "contact.attribution_lock",
+        "dataType": "SINGLE_OPTIONS",
+        "options": [
+          "Unlocked",
+          "Locked"
+        ],
+        "note": "a 2-option dropdown, not a checkbox. Workflow 6 sets Locked"
+      },
+      {
+        "name": "Claimed Partner ID",
+        "key": "contact.claimed_partner_id",
+        "dataType": "TEXT",
+        "note": "staging: forms write the claim here; only a first claim is copied into the real attribution fields"
+      },
+      {
+        "name": "Claimed Partner Name",
+        "key": "contact.claimed_partner_name",
+        "dataType": "TEXT",
+        "note": "staging"
+      },
+      {
+        "name": "Claimed Referral Code",
+        "key": "contact.claimed_referral_code",
+        "dataType": "TEXT",
+        "note": "staging. On Refer a Client its query key is am_id"
+      },
+      {
+        "name": "Claim Notes",
+        "key": "contact.claim_notes",
+        "dataType": "LARGE_TEXT",
+        "note": "staging"
+      },
+      {
+        "name": "Partner Notes",
+        "key": "contact.partner_notes",
+        "dataType": "LARGE_TEXT",
+        "note": "written by the Partner Sign-Up form"
+      }
+    ],
+    "opportunity": [
+      {
+        "name": "Client Monthly Revenue",
+        "key": "opportunity.client_monthly_revenue",
+        "dataType": "MONETORY",
+        "note": "typed by staff on the deal"
+      },
+      {
+        "name": "Reward Amount",
+        "key": "opportunity.reward_amount",
+        "dataType": "MONETORY",
+        "note": "typed by staff on the deal each cycle"
+      },
+      {
+        "name": "Commission Status",
+        "key": "opportunity.commission_status",
+        "dataType": "SINGLE_OPTIONS",
+        "options": [
+          "Not Eligible",
+          "Pending",
+          "Approved",
+          "Paid",
+          "Rejected",
+          "Disputed"
+        ],
+        "note": "workflows 6, 7, 8 set Pending, Approved, Paid"
+      },
+      {
+        "name": "Sale Date",
+        "key": "opportunity.sale_date",
+        "dataType": "DATE",
+        "note": "workflow 6, Right now . Date"
+      },
+      {
+        "name": "Commission Approval Date",
+        "key": "opportunity.commission_approval_date",
+        "dataType": "DATE",
+        "note": "workflow 7, Right now . Date"
+      },
+      {
+        "name": "Last Commission Payment Date",
+        "key": "opportunity.last_commission_payment_date",
+        "dataType": "DATE",
+        "note": "workflow 8, Right now . Date"
+      },
+      {
+        "name": "Commission Payments Made",
+        "key": "opportunity.commission_payments_made",
+        "dataType": "NUMERICAL",
+        "note": "built, no workflow writes it"
+      }
+    ]
+  },
+  "tags": [
+    "source/instantly",
+    "source/linkedin-outflo",
+    "source/referral",
+    "source/manual",
+    "status/nurture",
+    "status/not-now",
+    "status/dnc",
+    "status/no-show",
+    "status/auto-responder",
+    "interest/partner-program",
+    "referral-partner",
+    "referred-lead",
+    "referral-attribution-pending",
+    "referral-attribution-conflict",
+    "referral-verified",
+    "commission-pending",
+    "commission-approved",
+    "commission-paid",
+    "needs-reply",
+    "appointment-booked",
+    "appointment-showed",
+    "sales-qualified",
+    "partner-onboarding",
+    "partner-needs-activation"
+  ],
+  "pipelines": [
+    {
+      "name": "Partner Recruiting",
+      "stages": [
+        "New",
+        "Working",
+        "Engaged",
+        "Booked",
+        "Showed",
+        "Offer Made"
+      ]
+    },
+    {
+      "name": "Partner Lifecycle",
+      "stages": [
+        "Signed",
+        "Onboarding",
+        "Activated",
+        "Producing",
+        "Dormant"
+      ]
+    },
+    {
+      "name": "Referred Leads",
+      "stages": [
+        "Referral Received",
+        "Attempting Contact",
+        "Contacted / Nurture",
+        "Appointment Booked",
+        "Appointment Showed",
+        "Qualified / Consult Completed",
+        "Sold / Enrolled",
+        "Commission Pending",
+        "Commission Approved",
+        "Commission Paid",
+        "No Show / Unqualified",
+        "Lost / No Sale",
+        "Attribution Review"
+      ]
+    }
+  ],
+  "calendar": {
+    "_note": "Set over the API by build-structure.js. Seen in the first build and left at GHL defaults (not sent): eventType RoundRobin_OptimizeForAvailability, preBuffer 0, allowBookingFor counts calendar days, googleInvitationEmails on, the thank-you message and consent label GHL writes, no notifications, isZoomAdded false, an empty custom meeting location. openHours must hold one entry per day: several days in one entry is refused (422).",
+    "name": "Partner Intro Call",
+    "slug": "",
+    "description": "A 20-minute intro call with a prospective referral partner.",
+    "calendarType": "round_robin",
+    "widgetType": "classic",
+    "eventTitle": "Partner Intro Call — {{contact.name}}",
+    "eventColor": "#039be5",
+    "slotDuration": 20,
+    "slotDurationUnit": "mins",
+    "slotInterval": 30,
+    "slotIntervalUnit": "mins",
+    "slotBuffer": 10,
+    "slotBufferUnit": "mins",
+    "appoinmentPerSlot": 1,
+    "allowBookingAfter": 2,
+    "allowBookingAfterUnit": "hours",
+    "allowBookingFor": 30,
+    "allowBookingForUnit": "days",
+    "openHours": [
+      {
+        "daysOfTheWeek": [
+          1
+        ],
+        "hours": [
+          {
+            "openHour": 10,
+            "openMinute": 0,
+            "closeHour": 17,
+            "closeMinute": 0
+          }
+        ]
+      },
+      {
+        "daysOfTheWeek": [
+          2
+        ],
+        "hours": [
+          {
+            "openHour": 10,
+            "openMinute": 0,
+            "closeHour": 17,
+            "closeMinute": 0
+          }
+        ]
+      }
+    ],
+    "enableRecurring": false,
+    "autoConfirm": true,
+    "allowReschedule": true,
+    "allowCancellation": true,
+    "isActive": true
+  },
+  "workflows": [
+    "Instantly - Interested Partner Reply",
+    "Referral Engine - Referral Capture",
+    "Referral Engine - Staff Attribution",
+    "Referral Engine - Partner Sign-Up",
+    "Referral Engine - Affiliate Link",
+    "Referral Engine - Commission 1: Sale",
+    "Referral Engine - Commission 2: Approved",
+    "Referral Engine - Commission 3: Paid, monthly repeat"
+  ],
+  "forms": [
+    "Refer a Client",
+    "Partner Sign-Up",
+    "Staff Attribution"
+  ]
+}

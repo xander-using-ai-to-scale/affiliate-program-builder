@@ -1,0 +1,114 @@
+{
+  "_about": [
+    "The standard structure of the GHL affiliate program, as built and tested in the first build (Sep 21-22 2026).",
+    "This is the FALLBACK copy. The scripts read spec/structure.json and use this file only when that one is missing. Keep the two the same: tools/ghl/selftest.js fails when they differ.",
+    "A client's config (clients/<CLIENT_SLUG>/config.json) applies its own changes on top: the same name replaces an entry, a new name adds one, and remove drops names. See tools/ghl/README.md.",
+    "Always client-specific, so the client's config sets them: the Partner Type options, the segment/ tags, and the calendar slug and description. The build stops until the Partner Type options and the calendar slug are set.",
+    "The calendar hours and length are placeholders until the client confirms them.",
+    "build-structure.js builds the fields, tags, pipelines and calendar over the API. Workflows and forms are built in the GHL UI; their names are listed here so double-check.js and survey.js --ids can find them."
+  ],
+  "fields": {
+    "contact": [
+      { "name": "Instantly Campaign", "dataType": "TEXT" },
+      { "name": "Partner Type", "dataType": "SINGLE_OPTIONS", "options": [], "note": "client-specific: set the options in the client's config" },
+      { "name": "Partner Tier", "dataType": "SINGLE_OPTIONS", "options": ["Tier 1", "Tier 2", "Tier 3"] },
+      { "name": "Partnership Type", "dataType": "SINGLE_OPTIONS", "options": ["Referral", "White Label"] },
+      { "name": "Next Action Date", "dataType": "DATE" },
+      { "name": "Lost Reason", "dataType": "SINGLE_OPTIONS", "options": ["No fit", "Not interested", "No response", "Bad timing", "Do not contact"] },
+      { "name": "Affiliate Link", "dataType": "TEXT", "note": "the partner's personal referral link: written by the Partner Sign-Up workflow, then replaced by the Affiliate Link workflow with GHL's link plus the Partner ID and name" },
+      { "name": "Agreement Signed Date", "dataType": "DATE" },
+      { "name": "Referrals Sent", "dataType": "NUMERICAL" },
+      { "name": "Last Referral Date", "dataType": "DATE" },
+
+      { "name": "Contact Role", "dataType": "SINGLE_OPTIONS", "options": ["Referral Partner", "Referred Lead", "Client Staff", "Other"] },
+      { "name": "Partner ID", "dataType": "TEXT" },
+      { "name": "Referral Code", "dataType": "TEXT" },
+      { "name": "Reward Model", "dataType": "SINGLE_OPTIONS", "options": ["Per Lead", "Per Show", "Per Qualified Consult", "Per Sale", "Revenue Share", "Custom / Non-Cash"] },
+      { "name": "Revenue Share Percent", "dataType": "NUMERICAL" },
+      { "name": "Payment Preference", "dataType": "SINGLE_OPTIONS", "options": ["ACH", "Check", "PayPal", "Gift Card", "Service Credit", "Other"] },
+      { "name": "Referral Source Type", "dataType": "SINGLE_OPTIONS", "options": ["Partner", "Friend / Family", "Existing Client", "Employee", "Event", "Other"] },
+      { "name": "Referring Partner Name", "dataType": "TEXT" },
+      { "name": "Referring Partner ID", "dataType": "TEXT" },
+      { "name": "Referral Attribution Method", "dataType": "SINGLE_OPTIONS", "options": ["Referral Link", "QR Code", "Partner Submission", "Email Introduction", "Dedicated Phone", "Dedicated SMS", "Booking Form", "Intake Form", "Self-Reported", "Staff Entered", "AI Suggested", "Other"] },
+      { "name": "Attribution Confidence", "dataType": "SINGLE_OPTIONS", "options": ["Verified", "Claimed", "Pending Verification", "Conflicting", "Rejected"] },
+      { "name": "Referral Date", "dataType": "DATE" },
+      { "name": "Referral Evidence", "dataType": "LARGE_TEXT" },
+      { "name": "Attribution Lock", "dataType": "SINGLE_OPTIONS", "options": ["Unlocked", "Locked"] },
+
+      { "name": "Claimed Partner ID", "dataType": "TEXT", "note": "staging: forms write the claim here; only a first claim is copied into the real attribution fields" },
+      { "name": "Claimed Partner Name", "dataType": "TEXT", "note": "staging" },
+      { "name": "Claimed Referral Code", "dataType": "TEXT", "note": "staging" },
+      { "name": "Claim Notes", "dataType": "LARGE_TEXT", "note": "staging" },
+      { "name": "Partner Notes", "dataType": "LARGE_TEXT", "note": "staging: written by the Partner Sign-Up form" }
+    ],
+    "opportunity": [
+      { "name": "Client Monthly Revenue", "dataType": "MONETORY" },
+      { "name": "Reward Amount", "dataType": "MONETORY" },
+      { "name": "Commission Status", "dataType": "SINGLE_OPTIONS", "options": ["Not Eligible", "Pending", "Approved", "Paid", "Rejected", "Disputed"] },
+      { "name": "Sale Date", "dataType": "DATE" },
+      { "name": "Commission Approval Date", "dataType": "DATE" },
+      { "name": "Last Commission Payment Date", "dataType": "DATE" },
+      { "name": "Commission Payments Made", "dataType": "NUMERICAL" }
+    ]
+  },
+  "tags": [
+    "source/instantly", "source/linkedin-outflo", "source/referral", "source/manual",
+    "status/nurture", "status/not-now", "status/dnc", "status/no-show", "status/auto-responder",
+    "interest/partner-program",
+    "referral-partner", "referred-lead", "referral-attribution-pending", "referral-attribution-conflict",
+    "referral-verified", "commission-pending", "commission-approved", "commission-paid", "needs-reply",
+    "appointment-booked", "appointment-showed", "sales-qualified", "partner-onboarding", "partner-needs-activation"
+  ],
+  "pipelines": [
+    { "name": "Partner Recruiting", "stages": ["New", "Working", "Engaged", "Booked", "Showed", "Offer Made"] },
+    { "name": "Partner Lifecycle", "stages": ["Signed", "Onboarding", "Activated", "Producing", "Dormant"] },
+    {
+      "name": "Referred Leads",
+      "stages": [
+        "Referral Received", "Attempting Contact", "Contacted / Nurture", "Appointment Booked", "Appointment Showed",
+        "Qualified / Consult Completed", "Sold / Enrolled", "Commission Pending", "Commission Approved", "Commission Paid",
+        "No Show / Unqualified", "Lost / No Sale", "Attribution Review"
+      ]
+    }
+  ],
+  "calendar": {
+    "name": "Partner Intro Call",
+    "slug": "",
+    "description": "A 20-minute intro call with a prospective referral partner.",
+    "calendarType": "round_robin",
+    "widgetType": "classic",
+    "eventTitle": "Partner Intro Call — {{contact.name}}",
+    "eventColor": "#039be5",
+    "slotDuration": 20,
+    "slotDurationUnit": "mins",
+    "slotInterval": 30,
+    "slotIntervalUnit": "mins",
+    "slotBuffer": 10,
+    "slotBufferUnit": "mins",
+    "appoinmentPerSlot": 1,
+    "allowBookingAfter": 2,
+    "allowBookingAfterUnit": "hours",
+    "allowBookingFor": 30,
+    "allowBookingForUnit": "days",
+    "openHours": [
+      { "daysOfTheWeek": [1], "hours": [{ "openHour": 10, "openMinute": 0, "closeHour": 17, "closeMinute": 0 }] },
+      { "daysOfTheWeek": [2], "hours": [{ "openHour": 10, "openMinute": 0, "closeHour": 17, "closeMinute": 0 }] }
+    ],
+    "enableRecurring": false,
+    "autoConfirm": true,
+    "allowReschedule": true,
+    "allowCancellation": true,
+    "isActive": true
+  },
+  "workflows": [
+    "Instantly - Interested Partner Reply",
+    "Referral Engine - Referral Capture",
+    "Referral Engine - Staff Attribution",
+    "Referral Engine - Partner Sign-Up",
+    "Referral Engine - Affiliate Link",
+    "Referral Engine - Commission 1: Sale",
+    "Referral Engine - Commission 2: Approved",
+    "Referral Engine - Commission 3: Paid, monthly repeat"
+  ],
+  "forms": ["Refer a Client", "Partner Sign-Up", "Staff Attribution"]
+}

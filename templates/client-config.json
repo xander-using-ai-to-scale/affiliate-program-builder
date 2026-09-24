@@ -1,0 +1,33 @@
+{
+  "_readme": "The client's config for the scripts in tools/ghl. Copy this file to clients/<CLIENT_SLUG>/config.json (clients/ is never committed), then replace every placeholder in angle brackets. client: the business name. locationId: the sub-account id, the part after /location/ in the GHL address. tokenFile: the NAME of the file in ~/.secrets that holds the sub-account's Private Integration token, never the token itself. calendarOwnerUserId: the GHL user id of <PLACEHOLDER_USER>, who owns the calendar and every task until the client has a GHL user (survey.js lists the users and their ids). Keys that start with _ are notes: the scripts ignore them. Full guide: tools/ghl/README.md.",
+  "client": "<CLIENT_NAME>",
+  "locationId": "<LOCATION_ID>",
+  "tokenFile": "<TOKEN_FILE>",
+  "calendarOwnerUserId": "<PLACEHOLDER_USER_ID>",
+  "instantly": {
+    "_readme": "Only if the client runs cold email in Instantly; otherwise delete this whole block. webhookUrl is the Inbound Webhook URL of the workflow 'Instantly - Interested Partner Reply': copy it from that workflow's trigger. fire-test.js posts its test lead there and refuses a URL of another location.",
+    "webhookUrl": "<INSTANTLY_WEBHOOK_URL>"
+  },
+  "structure": {
+    "_readme": "This client's changes to the standard structure (spec/structure.json). A field or pipeline with a standard name replaces the standard one, a new name adds one, and a 'remove' block drops names (tools/ghl/README.md has the rules). Always client-specific: the Partner Type options (from the blueprint, ending with Other), the segment/ tags (lower case, one per partner group, ending with segment/other), and the calendar slug and description. build-structure.js refuses to run while any of them is missing or still a placeholder.",
+    "fields": {
+      "contact": [
+        { "name": "Partner Type", "dataType": "SINGLE_OPTIONS", "options": ["<PARTNER_TYPE_1>", "<PARTNER_TYPE_2>", "Other"] }
+      ]
+    },
+    "tags": ["segment/<SEGMENT_1>", "segment/<SEGMENT_2>", "segment/other"],
+    "calendar": {
+      "_readme": "These keys replace the standard calendar's. The standard: 20 minutes, Monday and Tuesday 10:00 to 17:00 in the account's time zone, owned by calendarOwnerUserId. Add slotDuration or openHours here only if the client wants other times.",
+      "slug": "<CLIENT_SLUG>-partner-intro-call",
+      "description": "A 20-minute intro call with a prospective referral partner for the <PROGRAM_NAME>."
+    }
+  },
+  "ids": {
+    "_readme": "Filled by: node tools/ghl/survey.js --client <CLIENT_SLUG> --ids. Paste its output over this whole block once the structure, forms and workflows exist (run it again after each). double-check.js compares these ids with the account; enroll.js and move-stage.js read them; the flowcharts read them too.",
+    "pipelines": {},
+    "fields": { "contact": {}, "opportunity": {} },
+    "calendars": {},
+    "workflows": {},
+    "forms": {}
+  }
+}

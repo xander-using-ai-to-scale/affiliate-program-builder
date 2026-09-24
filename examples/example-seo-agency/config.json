@@ -1,0 +1,74 @@
+{
+  "_readme": "The worked example's config: the first build (an SEO agency, Sep 21-22 2026) with its identifying details removed. Every GHL id is a placeholder or left out, so this file never touches a real account. It is valid for dry runs: node tools/ghl/build-structure.js --config examples/example-seo-agency/config.json --offline. A real client's config lives in clients/<CLIENT_SLUG>/config.json (never committed), copied from templates/client-config.json.",
+  "client": "Example SEO Agency",
+  "locationId": "<LOCATION_ID>",
+  "tokenFile": "Example Token.txt",
+  "calendarOwnerUserId": "<PLACEHOLDER_USER_ID>",
+  "instantly": {
+    "_readme": "The example runs cold email in Instantly, so workflow 1 is built. The webhook URL is the Inbound Webhook URL of 'Instantly - Interested Partner Reply'.",
+    "webhookUrl": "<INSTANTLY_WEBHOOK_URL>"
+  },
+  "structure": {
+    "_readme": "The example's changes to spec/structure.json: its 19 partner types, its 8 segment/ tags, one extra Lost Reason option, and the calendar slug and description.",
+    "fields": {
+      "contact": [
+        {
+          "name": "Partner Type",
+          "dataType": "SINGLE_OPTIONS",
+          "options": [
+            "Web Design / Development",
+            "Graphic Design / Branding",
+            "Print Shop / Commercial Printer",
+            "PPC / Paid Ads Agency",
+            "Social Media Agency",
+            "Email Marketing / Newsletter Agency",
+            "PR Firm / Publicist",
+            "Marketing Consultant / Fractional CMO",
+            "Business Coach",
+            "GHL / CRM Agency",
+            "Reputation / Review Management",
+            "Web Hosting",
+            "App Developer",
+            "Bookkeeper / CPA",
+            "Commercial Real Estate",
+            "Local Business Publication",
+            "Photographer / Video Production",
+            "Business Broker",
+            "Other"
+          ]
+        },
+        {
+          "name": "Lost Reason",
+          "dataType": "SINGLE_OPTIONS",
+          "options": ["No fit", "Not interested", "No response", "Bad timing", "Already has an SEO partner", "Do not contact"]
+        }
+      ]
+    },
+    "tags": [
+      "segment/web-design",
+      "segment/graphic-design",
+      "segment/print-shop",
+      "segment/ppc-agency",
+      "segment/social-media-agency",
+      "segment/email-marketing",
+      "segment/pr-publicist",
+      "segment/other"
+    ],
+    "calendar": {
+      "slug": "example-seo-agency-partner-intro-call",
+      "description": "A 20-minute intro call with a prospective referral partner for the Example SEO Partner Program."
+    }
+  },
+  "ids": {
+    "_readme": "In a real build, survey.js --ids writes this block. The example keeps only the form ids, as placeholders; every other id of the first build is left out.",
+    "pipelines": {},
+    "fields": { "contact": {}, "opportunity": {} },
+    "calendars": {},
+    "workflows": {},
+    "forms": {
+      "Refer a Client": "<REFER_FORM_ID>",
+      "Partner Sign-Up": "<SIGNUP_FORM_ID>",
+      "Staff Attribution": "<STAFF_FORM_ID>"
+    }
+  }
+}
